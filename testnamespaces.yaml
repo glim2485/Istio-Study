@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: servicea
+
+---
+
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: serviceb
+
+---
+
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: servicec

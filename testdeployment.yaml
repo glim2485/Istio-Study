@@ -1,0 +1,147 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: servicea
+  namespace: servicea
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: servicea
+  template:
+    metadata:
+      labels:
+        app: servicea
+    spec:
+      containers:
+      - name: servicea
+        image: gjlim2485/servicea:latest
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 6700
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: serviceb
+  namespace: serviceb
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: serviceb
+  template:
+    metadata:
+      labels:
+        app: serviceb
+    spec:
+      containers:
+      - name: serviceb
+        image: gjlim2485/serviceb:latest
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 6701
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: servicec
+  namespace: servicec
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: servicec
+  template:
+    metadata:
+      labels:
+        app: servicec
+    spec:
+      containers:
+      - name: servicec
+        image: gjlim2485/servicec:latest
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 6702
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: servicesuba-v1
+  namespace: servicea
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: servicesuba
+      version: v1
+  template:
+    metadata:
+      labels:
+        app: servicesuba
+        version: v1
+    spec:
+      containers:
+      - name: servicesuba
+        image: gjlim2485/testcontainer:latest
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 6789
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: servicesuba-v2
+  namespace: servicea
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: servicesuba
+      version: v2
+  template:
+    metadata:
+      labels:
+        app: servicesuba
+        version: v2
+    spec:
+      containers:
+      - name: servicesuba
+        image: gjlim2485/testcontainer:latest
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 6789
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: servicesuba-v3
+  namespace: servicea
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: servicesuba
+      version: v3
+  template:
+    metadata:
+      labels:
+        app: servicesuba
+        version: v3
+    spec:
+      containers:
+      - name: servicesuba
+        image: gjlim2485/testcontainer:latest
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 6789

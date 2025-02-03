@@ -1,0 +1,113 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: Gateway
+metadata:
+  name: test-gateway
+  namespace: default
+spec:
+  selector:
+    istio: ingressgateway
+  servers:
+  - port:
+      number: 80
+      name: http
+      protocol: HTTP
+    hosts:
+    - "*"
+
+---
+
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: my-virtual-service
+  namespace: default
+spec:
+  hosts:
+  - "*"  # Matches any host
+  gateways:
+  - test-gateway
+  http:
+  # Rule for servicea
+  - match:
+    - uri:
+        regex: ^/servicea(/|$)(.*)  # Matches /servicea or /servicea/anything
+    rewrite:
+      uriRegexRewrite:
+        match: ^/servicea(/|$)(.*)
+        rewrite: /\2  # Removes /servicea/ and rewrites to the remaining part
+    route:
+    - destination:
+        host: servicea.servicea.svc.cluster.local
+        port:
+          number: 6700
+  # Rule for servicesuba
+  - match:
+    - uri:
+        prefix: /uniqueid
+    route:
+    - destination:
+        host: servicesuba.servicea.svc.cluster.local
+        subset: version1
+        port:
+          number: 6789
+      weight: 100
+    - destination:
+        host: servicesuba.servicea.svc.cluster.local
+        subset: version2
+        port:
+          number: 6789
+      weight: 0
+    - destination:
+        host: servicesuba.servicea.svc.cluster.local
+        subset: version3
+        port:
+          number: 6789
+      weight: 0
+  # Rule for serviceb
+  - match:
+    - uri:
+        regex: ^/serviceb(/|$)(.*)  # Matches /servicea or /servicea/anything
+    rewrite:
+      uriRegexRewrite:
+        match: ^/serviceb(/|$)(.*)
+        rewrite: /\2  # Removes /servicea/ and rewrites to the remaining part
+    route:
+    - destination:
+        host: serviceb.serviceb.svc.cluster.local
+        port:
+          number: 6701
+  # Rule for servicec
+  - match:
+    - uri:
+        prefix: /getsecretcode
+    route:
+    - destination:
+        host: servicec.servicec.svc.cluster.local
+        port:
+          number: 6702
+
+---
+
+apiVersion: networking.istio.io/v1beta1
+kind: DestinationRule
+metadata:
+  name: servicesuba
+  namespace: servicea
+spec:
+  host: servicesuba.servicea.svc.cluster.local
+  subsets:
+  - name: version1
+    labels:
+      app: servicesuba
+      version: v1
+  - name: version2
+    labels:
+      app: servicesuba
+      version: v2
+  - name: version3
+    labels:
+      app: servicesuba
+      version: v3
+  trafficPolicy:
+    loadBalancer:
+      simple: ROUND_ROBIN
